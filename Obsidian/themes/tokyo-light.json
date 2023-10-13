@@ -1,0 +1,15 @@
+{
+    "altBackground": "#cbccd1",
+    "selectedBackground": "#7a85a8",
+    "activeBackground": "#7a85a8",
+    "outlineColor": "#c1c2c7",
+    "menuForeground": "#4c505e",
+    "hoverColor": "#c1c2c7",
+    "COMMENT": "#7c7f87",
+    "KEYWORD": "#965027",
+    "BUILTIN": "#166775",
+    "STRING": "#485e30",
+    "DEFINITION": "#4c505e",
+    "NUMBER": "#965027",
+    "editorSelectedBackground": "#d5d6db"
+}
