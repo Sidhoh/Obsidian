@@ -5,13 +5,14 @@ from Utils.editor import editor
 from Utils.linenums import linenums
 import os, json, sys
 from tkterminal import Terminal
+from Utils.TextPeer import TextPeer
 
 tk_title = "Obsidian"
 
 root = Tk()
 root.title(tk_title)
 root.overrideredirect(True)
-root.geometry("900x600+75+75")
+root.geometry("1000x650+75+75")
 root.iconbitmap("Obsidian.ico")
 
 root.minimized = False
@@ -45,7 +46,7 @@ ofPath = ""
 
 root.config(background=altBackground)
 title_bar = Frame(root, bg=altBackground, bd=0, highlightbackground=outlineColor, highlightthickness=1)
-layout = Frame(root, )
+layout = Frame(root, background=colors['editorSelectedBackground'])
 ttk.Style().theme_use("default")
 style = ttk.Style()
 style.configure("Custom.Treeview", background=altBackground, foreground=colors['menuForeground'], fieldbackground=altBackground, borderwidth=0, font=("Consolas", 8))
@@ -137,10 +138,15 @@ layout.columnconfigure(3, weight=1000)
 layout.rowconfigure(0, weight=100)
 
 # TextBox
+def mousewheel(evt):
+    editor.yview_scroll(int(-1*(evt.delta/110)), 'units')
+    minimap.yview_scroll(int(-1*(evt.delta/120)), 'units')
+
 editor = editor(layout, themepath=themePath)
-editor.grid(row=0, column=3, sticky="nsew")
+editor.bind_class("Text", '<MouseWheel>', mousewheel)
 linenums = linenums(layout ,editor)
-linenums.grid(row=0, column=2, sticky="nsew")
+minimap = TextPeer(editor, width=45, height=8, background=colors["editorSelectedBackground"], font=("Consolas", 4), fg=menuForeground)
+minimap.config(state=DISABLED, wrap=NONE,  highlightthickness=0, padx=15, pady=10, bd=0, relief=RIDGE, cursor="arrow")
 
 # Terminal
 terminalFram = Frame(layout, background=altBackground, bd=0, width=200, height=200)
@@ -154,14 +160,14 @@ terminal.pack(fill=X, padx=10, pady=5)
 
 # Status Bar
 statusbar = Frame(layout, background=altBackground, bd=0, height=15, highlightbackground=outlineColor, highlightthickness=1, highlightcolor=outlineColor)
-statusbar.grid(row=2, columnspan=4, sticky='nesw')
+statusbar.grid(row=2, columnspan=5, sticky='nesw')
 termialSB = Button(statusbar, command=openTerminal, text="\uebca", width=7, height=2, bg="#3d59a1", bd=0, fg=menuForeground, font=("codicon", 7), highlightthickness=0, activebackground=selectedBackground, activeforeground="#fff", relief=SUNKEN)
 notifcationSB = Button(statusbar, text="\ueaa2", width=7, height=2, bg=altBackground, bd=0, fg=menuForeground, font=("codicon", 7), highlightthickness=0, activebackground=selectedBackground, activeforeground="#fff", relief=SUNKEN)
 termialSB.pack(side=LEFT)
 notifcationSB.pack(side=RIGHT)
 
 # File Tree
-fileSystem = Frame(layout, background=altBackground, bd=0, highlightcolor=altBackground, highlightthickness=0, width=200)
+fileSystem = Frame(layout, background=altBackground, bd=0, highlightcolor=altBackground, highlightthickness=0, width=180)
 fileSystem.grid(rowspan=2,row=0, column=1, sticky="nsew")
 ExpLabel = Label(layout, text="EXPLORER", anchor=W, justify=LEFT, font=("Consolas", 8), height=0, bg=altBackground, fg=menuForeground)
 root.update_idletasks()
@@ -223,12 +229,10 @@ editor.bind("<Button-1>", on_click)
 fileSystem.bind("<Button-1>", on_click)
 sidePanel.bind("<Button-1>", on_click)
 
-
 # Menu Bar
 def filetree(directory, tree):
     ybar = Scrollbar(fileSystem, orient=VERTICAL, command=tree.yview)
     tree.configure(yscroll=ybar.set)
-    tree.heading("#0", text="Dir：" + directory, anchor="w")
     path = os.path.abspath(directory)
     node = tree.insert("", "end", text=path, open=True, values=(path))
     heading = Label(fileSystem, text=os.path.basename(directory).upper(), anchor=W, justify=LEFT, bg=altBackground, foreground=menuForeground, font=("Consolas", 8), height=0, pady=2)
@@ -243,6 +247,9 @@ def filetree(directory, tree):
 
         item = tree.selection()[0]
         full_path = tree.item(item, "text")
+        # editor.grid(row=0, column=3, sticky="nsew")
+        # linenums.grid(row=0, column=2, sticky="nsew")
+        # minimap.grid(row=0, column=4, sticky="nsew")
 
         parent_item = tree.parent(item)
         print(full_path)
@@ -251,7 +258,7 @@ def filetree(directory, tree):
             parent_item = tree.parent(parent_item)
 
         print(full_path)
-        f = open(full_path, "r")
+        f = open(full_path, "r", encoding="utf8")
         content = f.read()
         editor.delete("1.0", END)
         editor.insert(END, content)
@@ -275,10 +282,12 @@ def filetree(directory, tree):
 
 def _NText_file():
     global _file
-
-    pass
+    editor.grid(row=0, column=3, sticky="nsew")
+    linenums.grid(row=0, column=2, sticky="nsew")
+    minimap.grid(row=0, column=4, sticky="nsew")
     _file = False
     file_frame.place_forget()
+    pass
 
 def _New_File():
     global path
@@ -300,6 +309,10 @@ def _New_File():
     opSaved = False
     _file = False
     file_frame.place_forget()
+    editor.grid(row=0, column=3, sticky="nsew")
+    linenums.grid(row=0, column=2, sticky="nsew")
+    minimap.grid(row=0, column=4, sticky="nsew")
+    welcomeScreen.grid_forget()
 
 def _Open_File():
     global opSaved
@@ -310,7 +323,7 @@ def _Open_File():
     global _file
 
     opPath = filedialog.askopenfilename()
-    f = open(opPath, "r")
+    f = open(opPath, "r", encoding="utf8")
     content = f.read()
     editor.delete("1.0", END)
     editor.insert(END, content)
@@ -328,6 +341,10 @@ def _Open_File():
     filetree(os.path.dirname(opPath), tree_OF)
     _file = False
     file_frame.place_forget()
+    editor.grid(row=0, column=3, sticky="nsew")
+    linenums.grid(row=0, column=2, sticky="nsew")
+    minimap.grid(row=0, column=4, sticky="nsew")
+    welcomeScreen.grid_forget()
 
 def _Save_File():
     global Saved
@@ -342,7 +359,7 @@ def _Save_File():
     if Saved == False:
         if opSaved == False:
             path = filedialog.asksaveasfilename()
-            f = open(path, "w")
+            f = open(path, "w", encoding="utf8")
             conent = editor.get(1.0, "end-1c")
             f.write(conent)
             print("Saved @ " + path)
@@ -356,14 +373,14 @@ def _Save_File():
             Saved = True
     elif Saved == True:
         if opSaved == True:
-            f = open(opPath, "w")
+            f = open(opPath, "w", encoding="utf8")
             conent = editor.get(1.0, "end")
             f.write(conent)
             print("Saved @ " + path)
             print("hh")
             Saved = True
         else:
-            f = open(path, "w")
+            f = open(path, "w", encoding="utf8")
             conent = editor.get(1.0, "end-1c")
             f.write(conent)
             print("Saved @ " + path)
@@ -376,6 +393,7 @@ def _Save_File():
         pass
     _file = False
     file_frame.place_forget()
+    welcomeScreen.grid_forget()
 
 def _Save_As():
     global Saved
@@ -384,7 +402,7 @@ def _Save_As():
     global _file
 
     path = filedialog.asksaveasfilename()
-    f = open(path, "w")
+    f = open(path, "w", encoding="utf8")
     conent = editor.get(1.0, "end-1c")
     f.write(conent)
     print("Saved @ " + path)
@@ -413,7 +431,11 @@ def _Open_folder():
     terminal.basename = Termpath
     _file = False
     file_frame.place_forget()
-
+    editor.grid(row=0, column=3, sticky="nsew")
+    linenums.grid(row=0, column=2, sticky="nsew")
+    minimap.grid(row=0, column=4, sticky="nsew")
+    welcomeScreen.grid_forget()
+    
 file_frame = Frame(root, background=altBackground, width=200, height=161, bd=0, highlightbackground=outlineColor, highlightthickness=1,)
 NText_file = Button(file_frame, command=_NText_file, text="New Text File                    Ctrl + N", bg=altBackground, padx=15, pady=2, bd=0, fg=menuForeground, font=("Segoi UI", 8), highlightthickness=0, activebackground=selectedBackground, activeforeground="#fff", relief=SUNKEN)
 New_file = Button(file_frame, command=_New_File, text="New File                    Ctrl + Alt + N", bg=altBackground, padx=14, pady=2, bd=0, fg=menuForeground, font=("Segoi UI", 8), highlightthickness=0, activebackground=selectedBackground, activeforeground="#fff", relief=SUNKEN)
@@ -431,6 +453,22 @@ save.place(x=3, y=91)
 save_as.place(x=3, y=113)
 exit.place(x=3, y=135)
 
+# Welcome Screen
+welcomeScreen = Frame(layout, bg=colors['editorSelectedBackground'])
+welcomeTitle1 = Label(welcomeScreen, text="Obsidian", font=("Consolas", 13, 'bold'), fg=menuForeground, bg=colors['editorSelectedBackground'])
+welcomeTitle2 = Label(welcomeScreen, text="Made with ❤️", font=("Consolas", 12), fg=menuForeground, bg=colors['editorSelectedBackground'])
+welcomeStart = Label(welcomeScreen, text="Start", font=("Consolas", 11), fg=menuForeground, bg=colors['editorSelectedBackground'])
+NFileW = Button(welcomeScreen, command=_New_File ,text="\uea7f New File", bg=colors['editorSelectedBackground'], bd=0, fg="#3d59a1", font=("Consolas", 9), highlightthickness=0, activebackground=colors['editorSelectedBackground'], activeforeground="#7dcfff", relief=SUNKEN)
+OFileW = Button(welcomeScreen, command=_Open_File ,text="\uea94 Open File", bg=colors['editorSelectedBackground'], bd=0, fg="#3d59a1", font=("Consolas", 9), highlightthickness=0, activebackground=colors['editorSelectedBackground'], activeforeground="#7dcfff", relief=SUNKEN)
+OFolderW = Button(welcomeScreen, command=_Open_folder ,text="\ueaf7 Open Folder", bg=colors['editorSelectedBackground'], bd=0, fg="#3d59a1", font=("Consolas", 9), highlightthickness=0, activebackground=colors['editorSelectedBackground'], activeforeground="#7dcfff", relief=SUNKEN)
+
+welcomeTitle1.place(x=50, y=70)
+welcomeTitle2.place(x=50, y=95)
+welcomeStart.place(x=50, y=150)
+NFileW.place(x=50, y=180)
+OFileW.place(x=50, y=200)
+OFolderW.place(x=50, y=220)
+welcomeScreen.grid(row=0, column=3, sticky="nsew")
 
 _file = False
 edit_frame = Frame(root, background=altBackground, width=200, height=250, bd=0, highlightbackground=outlineColor, highlightthickness=1)
@@ -454,8 +492,6 @@ def file():
 
 
 # Menu Function
-
-
 def edit():
     global edit_frame
     global _edit
@@ -479,6 +515,10 @@ minimize_button = Button(title_bar, text="\ueaba", command=minimize_me, bg=altBa
 file_button = Button(title_bar, command=file, text="File", bg=altBackground, padx=2, pady=5, bd=0, fg=menuForeground, font=("Segoi UI", 9), highlightthickness=0, activebackground=selectedBackground, activeforeground="#fff", relief=SUNKEN)
 edit_button = Button(title_bar, command=edit, text="Edit", bg=altBackground, padx=2, pady=5, bd=0, fg=menuForeground, font=("Segoi UI", 9), highlightthickness=0, activebackground=selectedBackground, activeforeground="#fff", relief=SUNKEN)
 help_button = Button(title_bar, text="Help", bg=altBackground, padx=2, pady=5, bd=0, fg=menuForeground, font=("Segoi UI", 9), highlightthickness=0, activebackground=selectedBackground, activeforeground="#fff", relief=SUNKEN)
+
+#FS
+openFolderFS = Button(fileSystem, command=_Open_folder, text="Open Folder", bg="#3d59a1", padx=2, pady=5, width=20, bd=0, fg="white", font=("Segoi UI", 8), highlightthickness=0, activebackground="#304376", activeforeground="#fff", relief=SUNKEN)
+openFolderFS.place(x=20, y=50)
 
 # pack the widgets
 title_bar.pack(fill=X)
