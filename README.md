@@ -1,7 +1,7 @@
 <h2 align="center">
     <img src="./imgs/Obsidian.png" width=700><br>
 </h2>
-<p>A text editor built entirely with tkinter is still in its early stage. It possesses the basic tools of text editors, and in the future, it will undergo major changes. Obsidian features syntax highlighting (currently supporting Python only), line numbers, themes, status bar, minimap and an integrated terminal. Keep an eye out for substantial enhancements and updates in the future. </p>
+<p>A text editor built entirely with tkinter is still in its early stage. It possesses the basic tools of text editors, and in the future, it will undergo major changes. Obsidian features syntax highlighting (currently supporting Python only), line numbers, themes, status bar, minimap, tabs and an integrated terminal. Keep an eye out for substantial enhancements and updates in the future. </p>
 
 # Screenshots 📸
 <h4 align="left">

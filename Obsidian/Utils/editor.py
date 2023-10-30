@@ -10,7 +10,7 @@ class editor(Text):
         theme = open(themepath, "r")
         colors = json.load(theme)        
         self.focus_set()
-        self.configure(bg=colors['editorSelectedBackground'], bd=0,fg=colors['menuForeground'], wrap=NONE, highlightthickness=0, highlightcolor=colors['outlineColor'], selectbackground=colors['editorSelectedBackground'], font=("Consolas", 8), padx=15, pady=10)
+        self.configure(bg=colors['editorSelectedBackground'], bd=0,fg=colors['menuForeground'], wrap=NONE, highlightthickness=0, highlightcolor=colors['outlineColor'], selectbackground=colors['editorSelectedBackground'], font=("Consolas", 8), padx=0, pady=10)
         master.update_idletasks()
         height = int(master.winfo_screenheight())
         # Syntax Highlighting

@@ -46,11 +46,11 @@ ofPath = ""
 
 root.config(background=altBackground)
 title_bar = Frame(root, bg=altBackground, bd=0, highlightbackground=outlineColor, highlightthickness=1)
-layout = Frame(root, background=colors['editorSelectedBackground'])
+layout = Frame(root, background=outlineColor)
 ttk.Style().theme_use("default")
 style = ttk.Style()
-style.configure("Custom.Treeview", background=altBackground, foreground=colors['menuForeground'], fieldbackground=altBackground, borderwidth=0, font=("Consolas", 8))
-style.map("Custom.Treeview", background=[('selected', colors['selectedBackground'])], foreground=[('selected', '#fff')])
+style.configure("Custom.Treeview", background=altBackground, foreground=colors['menuForeground'], fieldbackground=altBackground, borderwidth=0, font=("Segoi UI", 8))
+style.map("Custom.Treeview", background=[('selected', colors['selectedBackground'])], foreground=[('selected', menuForeground)])
 
 def set_appwindow(mainWindow):
     GWL_EXSTYLE=-20
@@ -110,14 +110,14 @@ def on_click(event):
     isOpen = False
 
 def settings():
-    setting_frame.place(x=130, y=-25, relx=0, rely=1, anchor="s")
+    setting_frame.place(x=132, y=-24, relx=0, rely=1, anchor="s")
 
 isOpenTL = False
 def themepicker():
     global isOpenTL
     global themePath
     if isOpenTL == False:
-        themeList.place(x=275, y=-25, relx=0, rely=1, anchor="s")
+        themeList.place(x=277, y=-24, relx=0, rely=1, anchor="s")
         isOpenTL = True
     elif isOpenTL == True:
         themeList.place_forget()
@@ -127,7 +127,10 @@ isOpenT = False
 def openTerminal():
     global isOpenT
     if isOpenT == False:
-        terminalFram.grid(row=1, columnspan=3, column=2, sticky='nesw')
+        terminalFram.grid(row=2, columnspan=3, column=2, sticky='nesw', padx=(1,1), pady=(1,0))
+        statusbar.grid(row=3, columnspan=5, sticky='nesw')
+        fileSystem.grid(rowspan=3,row=0, column=1, sticky="nsew")
+        sidePanel.grid(rowspan=3, row=0, column=0, sticky="nsew")
         isOpenT = True
     elif isOpenT == True:
         terminalFram.grid_forget()
@@ -135,7 +138,13 @@ def openTerminal():
 
 layout.columnconfigure(1, weight=1)
 layout.columnconfigure(3, weight=1000)
-layout.rowconfigure(0, weight=100)
+layout.rowconfigure(0, weight=0)
+layout.rowconfigure(1, weight=100)
+
+# Tabs
+tabs = Frame(layout ,background=outlineColor, height=30)
+tabFill = Label(tabs, padx=5, pady=5, background=altBackground, bd=0)
+tabFill.pack(side=RIGHT, fill=BOTH, expand=True, padx=(1,0), pady=(0,1))
 
 # TextBox
 def mousewheel(evt):
@@ -145,8 +154,8 @@ def mousewheel(evt):
 editor = editor(layout, themepath=themePath)
 editor.bind_class("Text", '<MouseWheel>', mousewheel)
 linenums = linenums(layout ,editor)
-minimap = TextPeer(editor, width=45, height=8, background=colors["editorSelectedBackground"], font=("Consolas", 4), fg=menuForeground)
-minimap.config(state=DISABLED, wrap=NONE,  highlightthickness=0, padx=15, pady=10, bd=0, relief=RIDGE, cursor="arrow")
+minimap = TextPeer(editor, width=45, height=8, background=colors["editorSelectedBackground"], font=("Consolas", 3), fg=menuForeground)
+minimap.config(state=DISABLED, wrap=NONE, highlightthickness=0, padx=5, pady=10, bd=0, relief=RIDGE, cursor="arrow")
 
 # Terminal
 terminalFram = Frame(layout, background=altBackground, bd=0, width=200, height=200)
@@ -161,7 +170,7 @@ terminal.pack(fill=X, padx=10, pady=5)
 # Status Bar
 statusbar = Frame(layout, background=altBackground, bd=0, height=15, highlightbackground=outlineColor, highlightthickness=1, highlightcolor=outlineColor)
 statusbar.grid(row=2, columnspan=5, sticky='nesw')
-termialSB = Button(statusbar, command=openTerminal, text="\uebca", width=7, height=2, bg="#3d59a1", bd=0, fg=menuForeground, font=("codicon", 7), highlightthickness=0, activebackground=selectedBackground, activeforeground="#fff", relief=SUNKEN)
+termialSB = Button(statusbar, command=openTerminal, text="\uebca", width=7, height=2, bg="#3d59a1", bd=0, fg=menuForeground, font=("codicon", 7, "bold"), highlightthickness=0, activebackground=selectedBackground, activeforeground="#fff", relief=SUNKEN)
 notifcationSB = Button(statusbar, text="\ueaa2", width=7, height=2, bg=altBackground, bd=0, fg=menuForeground, font=("codicon", 7), highlightthickness=0, activebackground=selectedBackground, activeforeground="#fff", relief=SUNKEN)
 termialSB.pack(side=LEFT)
 notifcationSB.pack(side=RIGHT)
@@ -173,8 +182,7 @@ ExpLabel = Label(layout, text="EXPLORER", anchor=W, justify=LEFT, font=("Consola
 root.update_idletasks()
 width = int(layout.winfo_width() - 200)
 ExpLabel.configure(width=width)
-ExpLabel.place(x=47, y=11)
-
+ExpLabel.place(x=50, y=11)
 
 # Side Panel
 def restart_program():
@@ -202,7 +210,7 @@ def darktheme():
     restart_program()
 
 sidePanel = Frame(layout, background=altBackground, bd=0,width=8)
-sidePanel.grid(rowspan=2, row=0, column=0, sticky="nsew")
+sidePanel.grid(rowspan=2, row=0, column=0, sticky="nsew", padx=(1,0))
 themeList = Frame(root, background=altBackground, width=200, height=161, bd=0, highlightbackground=outlineColor, highlightthickness=1, padx=3, pady=3)
 tkNight = Button(themeList, command=darktheme,text="Tokyo Night", bg=altBackground, padx=15, pady=2, bd=0, fg=menuForeground, font=("Segoi UI", 8), highlightthickness=0, activebackground=selectedBackground, activeforeground="#fff", relief=SUNKEN)
 tkLight = Button(themeList, command=lighttheme, text="Tokyo Light", bg=altBackground, padx=15, pady=2, bd=0, fg=menuForeground, font=("Segoi UI", 8), highlightthickness=0, activebackground=selectedBackground, activeforeground="#fff", relief=SUNKEN)
@@ -235,42 +243,65 @@ def filetree(directory, tree):
     tree.configure(yscroll=ybar.set)
     path = os.path.abspath(directory)
     node = tree.insert("", "end", text=path, open=True, values=(path))
-    heading = Label(fileSystem, text=os.path.basename(directory).upper(), anchor=W, justify=LEFT, bg=altBackground, foreground=menuForeground, font=("Consolas", 8), height=0, pady=2)
+    heading = Label(fileSystem, text=os.path.basename(directory).upper(), anchor=W, justify=LEFT, bg=altBackground, foreground=menuForeground, font=("Segoi UI", 8), height=0, pady=2)
     root.update_idletasks()
     width = int(layout.winfo_width() - 200)
     heading.configure(width=width)
-    heading.place(x=15, y=32)
+    heading.place(x=15, y=31)
 
-    def selectItem(a):
+    def selectItem(event):
         global path
         global Saved
+        global ofPath
+    
+        item = tree.identify_row(event.y)
 
-        item = tree.selection()[0]
-        full_path = tree.item(item, "text")
-        # editor.grid(row=0, column=3, sticky="nsew")
-        # linenums.grid(row=0, column=2, sticky="nsew")
-        # minimap.grid(row=0, column=4, sticky="nsew")
+        def is_child(tree, item):
+            children = tree.get_children(item)
+            return bool(children)
 
-        parent_item = tree.parent(item)
-        print(full_path)
-        while parent_item:
-            full_path = tree.item(parent_item, "text") + r"\ "[0] + full_path
-            parent_item = tree.parent(parent_item)
+        if item:
+            # Check if the clicked item is a child item (not a parent or separator)
+            if is_child(tree, item):
+                pass
+            else:
+                def tabClick(item):
+                    global path
+                    f = open(full_path, "r", encoding="utf8")
+                    content = f.read()
+                    editor.delete("1.0", END)
+                    editor.insert(END, content)
+                    tree.selection_set(item)
+                    path = full_path
+                    
+                item = tree.selection()[0]
+                full_path = tree.item(item, "text")
+                parent_item = tree.parent(item)
+                print(full_path)
+                while parent_item:
+                    full_path = tree.item(parent_item, "text") + r"\ "[0] + full_path
+                    parent_item = tree.parent(parent_item)
 
-        print(full_path)
-        f = open(full_path, "r", encoding="utf8")
-        content = f.read()
-        editor.delete("1.0", END)
-        editor.insert(END, content)
-        path = full_path
-        Saved = True
+                print(full_path)
+                print(ofPath)
+                f = open(full_path, "r", encoding="utf8")
+                content = f.read()
+                editor.delete("1.0", END)
+                editor.insert(END, content)
+                path = full_path
+                Saved = True
+                fileName = os.path.basename(full_path)
+                tabTitle = Button(tabs, command=lambda item_id=item: tabClick(item_id),text=fileName, padx=8, pady=2, background=altBackground, fg=menuForeground, relief=SUNKEN, bd=0,font=("Segoi UI", 10), activebackground=selectedBackground, activeforeground="#fff")
+                tabTitle.pack(side=LEFT, padx=(1,0), pady=(0,1))
+
+
 
     def traverse_dir(parent, path):
         for d in os.listdir(path):
             full_path = os.path.join(path, d)
             isdir = os.path.isdir(full_path)
             id = tree.insert(parent, "end", text=d, open=False)
-            tree.bind("<ButtonRelease-1>", selectItem)
+            tree.bind("<Double-Button-1>", selectItem)
             if isdir:
                 traverse_dir(id, full_path)
 
@@ -309,9 +340,10 @@ def _New_File():
     opSaved = False
     _file = False
     file_frame.place_forget()
-    editor.grid(row=0, column=3, sticky="nsew")
-    linenums.grid(row=0, column=2, sticky="nsew")
-    minimap.grid(row=0, column=4, sticky="nsew")
+    tabs.grid(row=0, column=2, columnspan=4, sticky="nsew")
+    editor.grid(row=1, column=3, sticky="nsew")
+    linenums.grid(row=1, column=2, sticky="nsew")
+    minimap.grid(row=1, column=4, sticky="nsew")
     welcomeScreen.grid_forget()
 
 def _Open_File():
@@ -355,7 +387,7 @@ def _Save_File():
 
     print(opSaved)
     print(Saved)
-
+    
     if Saved == False:
         if opSaved == False:
             path = filedialog.asksaveasfilename()
@@ -431,9 +463,10 @@ def _Open_folder():
     terminal.basename = Termpath
     _file = False
     file_frame.place_forget()
-    editor.grid(row=0, column=3, sticky="nsew")
-    linenums.grid(row=0, column=2, sticky="nsew")
-    minimap.grid(row=0, column=4, sticky="nsew")
+    tabs.grid(row=0, column=2, columnspan=4, sticky="nsew")
+    editor.grid(row=1, column=3, sticky="nsew")
+    linenums.grid(row=1, column=2, sticky="nsew", padx=(1,0))
+    minimap.grid(row=1, column=4, sticky="nsew", padx=(1,1))
     welcomeScreen.grid_forget()
     
 file_frame = Frame(root, background=altBackground, width=200, height=161, bd=0, highlightbackground=outlineColor, highlightthickness=1,)
@@ -461,14 +494,14 @@ welcomeStart = Label(welcomeScreen, text="Start", font=("Consolas", 11), fg=menu
 NFileW = Button(welcomeScreen, command=_New_File ,text="\uea7f New File", bg=colors['editorSelectedBackground'], bd=0, fg="#3d59a1", font=("Consolas", 9), highlightthickness=0, activebackground=colors['editorSelectedBackground'], activeforeground="#7dcfff", relief=SUNKEN)
 OFileW = Button(welcomeScreen, command=_Open_File ,text="\uea94 Open File", bg=colors['editorSelectedBackground'], bd=0, fg="#3d59a1", font=("Consolas", 9), highlightthickness=0, activebackground=colors['editorSelectedBackground'], activeforeground="#7dcfff", relief=SUNKEN)
 OFolderW = Button(welcomeScreen, command=_Open_folder ,text="\ueaf7 Open Folder", bg=colors['editorSelectedBackground'], bd=0, fg="#3d59a1", font=("Consolas", 9), highlightthickness=0, activebackground=colors['editorSelectedBackground'], activeforeground="#7dcfff", relief=SUNKEN)
-
+welcomeScreen.bind("<Button-1>", on_click)
 welcomeTitle1.place(x=50, y=70)
 welcomeTitle2.place(x=50, y=95)
 welcomeStart.place(x=50, y=150)
 NFileW.place(x=50, y=180)
 OFileW.place(x=50, y=200)
 OFolderW.place(x=50, y=220)
-welcomeScreen.grid(row=0, column=3, sticky="nsew")
+welcomeScreen.grid(row=1, column=3, sticky="nsew", padx=(1,1))
 
 _file = False
 edit_frame = Frame(root, background=altBackground, width=200, height=250, bd=0, highlightbackground=outlineColor, highlightthickness=1)
@@ -703,7 +736,7 @@ root.bind("<Control-`>", lambda event: openTerminal())
 root.bind("<Control-n>", lambda event: _NText_file())
 root.bind("<Control-Alt-n>", lambda event: _New_File())
 root.bind("<Control-o>", lambda event: _Open_File())
-root.bind("<Control-k>", lambda event: _Open_File())
+root.bind("<Control-k>", lambda event: _Open_folder())
 root.bind("<Control-s>", lambda event: _Save_File())
 root.bind("<KeyPress-S>", lambda event: _Save_As())
 
